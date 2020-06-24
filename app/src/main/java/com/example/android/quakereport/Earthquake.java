@@ -4,51 +4,69 @@ package com.example.android.quakereport;
  * {@link Earthquake} contains information about a single earthquake
  */
 public class Earthquake {
-    /** Magnitude of the earthquake */
+    /**
+     * Magnitude of the earthquake
+     */
     private String mMagnitude;
-    /** Location of the earthquake */
+    /**
+     * Location of the earthquake
+     */
     private String mLocation;
-    /** Date of the earthquake */
-    private String mDate;
+    /**
+     * Time in milliseconds of the earthquake
+     */
+    private long mTimeInMilliseconds;
 
     /**
-     * @param mag is the magnitude or size of the earthquake
-     * @param location is the city where it was registered
-     * @param date is the date the earthquake happened
+     * @param mag          is the magnitude or size of the earthquake
+     * @param location     is the city where it was registered
+     * @param timeInMillis is the date the earthquake happened
      */
-    public Earthquake(String mag, String location, String date){
+    public Earthquake(String mag, String location, Long timeInMillis) {
         setMag(mag);
         setLocation(location);
-        setDate(date);
+        setTimeInMillis(timeInMillis);
     }
 
-    /** Sets the {@param Magnitude} of the earthquake */
-    public void setMag(String Magnitude) {
-        this.mMagnitude = Magnitude;
+    /**
+     * Returns the time of the earthquake
+     */
+    public long getTimeInMillis() {
+        return mTimeInMilliseconds;
     }
 
-    /** Sets the {@param Location} of the earthquake */
-    public void setLocation(String Location) {
-        this.mLocation = Location;
+    /**
+     * Sets the {@param Date} of the earthquake
+     */
+    public void setTimeInMillis(Long timeInMillis) {
+        this.mTimeInMilliseconds = timeInMillis;
     }
 
-    /** Sets the {@param Date} of the earthquake */
-    public void setDate(String Date) {
-        this.mDate = Date;
-    }
-
-    /** Returns the magnitude of the earthquake */
+    /**
+     * Returns the magnitude of the earthquake
+     */
     public String getMag() {
         return mMagnitude;
     }
 
-    /** Returns the location of the earthquake */
+    /**
+     * Sets the {@param Magnitude} of the earthquake
+     */
+    public void setMag(String Magnitude) {
+        this.mMagnitude = Magnitude;
+    }
+
+    /**
+     * Returns the location of the earthquake
+     */
     public String getLocation() {
         return mLocation;
     }
 
-    /** Returns the date of the earthquake */
-    public String getDate() {
-        return mDate;
+    /**
+     * Sets the {@param Location} of the earthquake
+     */
+    public void setLocation(String Location) {
+        this.mLocation = Location;
     }
 }

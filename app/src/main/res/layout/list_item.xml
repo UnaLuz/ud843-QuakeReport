@@ -10,27 +10,32 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="start"
-        android:text="5.5"/>
+        android:gravity="start" />
 
     <TextView
         android:id="@+id/location_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:text="San Martin, Argentina"
         android:gravity="start"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"/>
+        android:layout_marginStart="16dp" />
 
     <TextView
         android:id="@+id/date_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
+        android:gravity="end" />
+
+    <TextView
+        android:id="@+id/time_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
         android:gravity="end"
-        android:text="June 23, 2020"/>
+        android:textAllCaps="true" />
 
 </LinearLayout>

@@ -55,15 +55,13 @@ public class QueryUtils {
                 JSONObject currentProperties = currentFeature.getJSONObject("properties");
 
                 // Get all the info of the earthquake at index i
-                // Convert the magnitude value from Double to String
-                String mag = Double.toString(currentProperties.getDouble("mag"));
+                String mag = currentProperties.getString("mag");
                 String location = currentProperties.getString("place");
-                // Convert the date value from int to String
-                String date = Long.toString(currentProperties.getLong("time"));
+                long timeInMilliseconds = currentProperties.getLong("time");
 
                 // Create an earthquake object with the data gathered
                 // and add it to the list
-                earthquakes.add(new Earthquake(mag, location, date));
+                earthquakes.add(new Earthquake(mag, location, timeInMilliseconds));
             }
 
         } catch (JSONException e) {
