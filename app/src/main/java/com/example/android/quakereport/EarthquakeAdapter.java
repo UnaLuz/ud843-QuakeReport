@@ -42,7 +42,7 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
             // Set it's text to show the magnitude of the earthquake
             float mag = currentEarthquake.getMag();
             // Formatter to make the magnitude always have one decimal
-            DecimalFormat decimalFormat = new DecimalFormat("#.0");
+            DecimalFormat decimalFormat = new DecimalFormat("0.0");
             magTextView.setText(decimalFormat.format(mag));
 
             // Set the proper background color on the magnitude circle.
