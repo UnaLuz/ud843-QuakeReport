@@ -61,10 +61,11 @@ public class QueryUtils {
                 float mag = (float) currentProperties.getDouble("mag");
                 String location = currentProperties.getString("place");
                 long timeInMilliseconds = currentProperties.getLong("time");
+                String url = currentProperties.getString("url");
 
                 // Create an earthquake object with the data gathered
                 // and add it to the list
-                earthquakes.add(new Earthquake(mag, location, timeInMilliseconds));
+                earthquakes.add(new Earthquake(mag, location, timeInMilliseconds, url));
             }
 
         } catch (JSONException e) {

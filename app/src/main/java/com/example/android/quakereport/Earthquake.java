@@ -16,16 +16,22 @@ public class Earthquake {
      * Time in milliseconds of the earthquake
      */
     private long mTimeInMilliseconds;
+    /**
+     * Url of the earthquake info
+     */
+    private String mUrl;
 
     /**
      * @param mag          is the magnitude or size of the earthquake
      * @param location     is the city where it was registered
      * @param timeInMillis is the date the earthquake happened
+     * @param url          is the url that takes to the earthquake info page
      */
-    public Earthquake(float mag, String location, Long timeInMillis) {
+    public Earthquake(float mag, String location, Long timeInMillis, String url) {
         setMag(mag);
         setLocation(location);
         setTimeInMillis(timeInMillis);
+        setUrl(url);
     }
 
     /**
@@ -68,5 +74,19 @@ public class Earthquake {
      */
     public void setLocation(String Location) {
         this.mLocation = Location;
+    }
+
+    /**
+     * Returns the url of the earthquake
+     */
+    public String getUrl() {
+        return mUrl;
+    }
+
+    /**
+     * Sets the {@param url} of the earthquake info
+     */
+    public void setUrl(String url) {
+        this.mUrl = url;
     }
 }
