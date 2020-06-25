@@ -15,4 +15,10 @@
 -->
 <resources>
     <string name="app_name">Quake Report</string>
+    <string name="time_placeholder">3:12 P. M.</string>
+    <string name="date_placeholder">Jun 16, 2020</string>
+    <string name="area_placeholder">8km WNW of</string>
+    <string name="city_placeholder">General San Martin, Argentina</string>
+    <string name="mag_placeholder">6.3</string>
+    <string name="near_the">Near the</string>
 </resources>

@@ -34,21 +34,36 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         // Get the current earthquake item
         Earthquake currentEarthquake = getItem(position);
         if (currentEarthquake != null) {
-            // Get the text view with ID magnitud_text_view
-            TextView magTextView = listItemView.findViewById(R.id.magnitud_text_view);
+            // Get the text view with ID magnitude_text_view
+            TextView magTextView = listItemView.findViewById(R.id.magnitude_text_view);
             // Set it's text to show the magnitude of the earthquake
             magTextView.setText(currentEarthquake.getMag());
 
-            // Get the text view with ID location_text_view
-            TextView locationTextView = listItemView.findViewById(R.id.location_text_view);
-            // Set it's text to show the location of the earthquake
-            locationTextView.setText(currentEarthquake.getLocation());
+            // Get the text view with ID area_text_view
+            TextView areaTextView = listItemView.findViewById(R.id.area_text_view);
+            // Get the text view with ID city_text_view
+            TextView cityTextView = listItemView.findViewById(R.id.city_text_view);
+            // Get the location String
+            String location = currentEarthquake.getLocation();
+
+            // Find where the word 'of' is
+            int separationIndex = location.indexOf(" of ");
+            // If the word 'of' is in the location means that there is a relative location
+            // so use that for the areaTextView including the word 'of'
+            // and the rest to the cityTextView
+            if (separationIndex != -1) {
+                areaTextView.setText(location.substring(0, separationIndex + 3));
+                cityTextView.setText(location.substring(separationIndex + 4));
+            } else {
+                areaTextView.setText(R.string.near_the);
+                cityTextView.setText(location);
+            }
 
             // Create a new Date object from the time in milliseconds of the earthquake
             Date dateObject = new Date(currentEarthquake.getTimeInMillis());
 
             // Find the TextView with view ID date
-            TextView dateView = (TextView) listItemView.findViewById(R.id.date_text_view);
+            TextView dateView = listItemView.findViewById(R.id.date_text_view);
             // Format the date string (i.e. "Mar 3, 1984")
             String formattedDate = formatDate(dateObject);
             // Capitalize the first letter of the month
@@ -57,7 +72,7 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
             dateView.setText(formattedDate);
 
             // Find the TextView with view ID time
-            TextView timeView = (TextView) listItemView.findViewById(R.id.time_text_view);
+            TextView timeView = listItemView.findViewById(R.id.time_text_view);
             // Format the time string (i.e. "4:30PM")
             String formattedTime = formatTime(dateObject);
             // Display the time of the current earthquake in that TextView
