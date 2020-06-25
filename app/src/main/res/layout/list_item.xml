@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
@@ -8,24 +9,25 @@
 
     <TextView
         android:id="@+id/magnitude_text_view"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:background="@color/colorAccent"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_gravity="center"
+        android:background="@drawable/magnitude_circle"
         android:gravity="center"
         android:text="@string/mag_placeholder"
         android:textAlignment="center"
-        android:textColor="#FFF"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        app:fontFamily="sans-serif-medium" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
@@ -33,14 +35,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:text="@string/area_placeholder" />
+            android:text="@string/area_placeholder"
+            android:textColor="@android:color/tertiary_text_light" />
 
         <TextView
             android:id="@+id/city_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:text="@string/city_placeholder" />
+            android:text="@string/city_placeholder"
+            android:textColor="@android:color/primary_text_light" />
 
     </LinearLayout>
 

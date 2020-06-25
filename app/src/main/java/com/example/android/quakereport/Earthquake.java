@@ -7,7 +7,7 @@ public class Earthquake {
     /**
      * Magnitude of the earthquake
      */
-    private String mMagnitude;
+    private float mMagnitude;
     /**
      * Location of the earthquake
      */
@@ -22,7 +22,7 @@ public class Earthquake {
      * @param location     is the city where it was registered
      * @param timeInMillis is the date the earthquake happened
      */
-    public Earthquake(String mag, String location, Long timeInMillis) {
+    public Earthquake(float mag, String location, Long timeInMillis) {
         setMag(mag);
         setLocation(location);
         setTimeInMillis(timeInMillis);
@@ -45,14 +45,14 @@ public class Earthquake {
     /**
      * Returns the magnitude of the earthquake
      */
-    public String getMag() {
+    public float getMag() {
         return mMagnitude;
     }
 
     /**
      * Sets the {@param Magnitude} of the earthquake
      */
-    public void setMag(String Magnitude) {
+    public void setMag(float Magnitude) {
         this.mMagnitude = Magnitude;
     }
 

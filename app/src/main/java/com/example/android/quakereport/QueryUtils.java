@@ -55,7 +55,7 @@ public class QueryUtils {
                 JSONObject currentProperties = currentFeature.getJSONObject("properties");
 
                 // Get all the info of the earthquake at index i
-                String mag = currentProperties.getString("mag");
+                float mag = (float) currentProperties.getDouble("mag");
                 String location = currentProperties.getString("place");
                 long timeInMilliseconds = currentProperties.getLong("time");
 

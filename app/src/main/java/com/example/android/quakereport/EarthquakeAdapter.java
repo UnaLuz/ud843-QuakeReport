@@ -1,6 +1,7 @@
 package com.example.android.quakereport;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +40,18 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
             // Get the text view with ID magnitude_text_view
             TextView magTextView = listItemView.findViewById(R.id.magnitude_text_view);
             // Set it's text to show the magnitude of the earthquake
-            magTextView.setText(currentEarthquake.getMag());
+            float mag = currentEarthquake.getMag();
+            // Formatter to make the magnitude always have one decimal
+            DecimalFormat decimalFormat = new DecimalFormat("#.0");
+            magTextView.setText(decimalFormat.format(mag));
+
+            // Set the proper background color on the magnitude circle.
+            // Fetch the background from the TextView, which is a GradientDrawable.
+            GradientDrawable magnitudeCircle = (GradientDrawable) magTextView.getBackground();
+            // Get the appropriate background color based on the current earthquake magnitude
+            int magnitudeColor = getMagnitudeColor(currentEarthquake.getMag());
+            // Set the color on the magnitude circle
+            magnitudeCircle.setColor(magnitudeColor);
 
             // Get the text view with ID area_text_view
             TextView areaTextView = listItemView.findViewById(R.id.area_text_view);
@@ -81,6 +95,33 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
         // Return the item view with the correct information
         return listItemView;
+    }
+
+    private int getMagnitudeColor(float mag) {
+        switch ((int) Math.floor(mag)) {
+            case 0:
+            case 1:
+                return ContextCompat.getColor(getContext(), R.color.magnitude1);
+            case 2:
+                return ContextCompat.getColor(getContext(), R.color.magnitude2);
+            case 3:
+                return ContextCompat.getColor(getContext(), R.color.magnitude3);
+            case 4:
+                return ContextCompat.getColor(getContext(), R.color.magnitude4);
+            case 5:
+                return ContextCompat.getColor(getContext(), R.color.magnitude5);
+            case 6:
+                return ContextCompat.getColor(getContext(), R.color.magnitude6);
+            case 7:
+                return ContextCompat.getColor(getContext(), R.color.magnitude7);
+            case 8:
+                return ContextCompat.getColor(getContext(), R.color.magnitude8);
+            case 9:
+                return ContextCompat.getColor(getContext(), R.color.magnitude9);
+            case 10:
+            default:
+                return ContextCompat.getColor(getContext(), R.color.magnitude10plus);
+        }
     }
 
     private String formatDate(Date date) {
