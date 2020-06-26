@@ -56,23 +56,27 @@ public class EarthquakeActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Find the current earthquake that was clicked on
                 Earthquake current = adapter.getItem(position);
-                if (current != null) {
-                    // Try to parse the the earthquake url and send an intent
-                    // Catch the exception so the app doesn't crash
-                    // print the error message to the logs and Show the user that an error occurred
-                    try {
-                        // Create a new intent to view the earthquake URI
-                        Intent openBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse(current.getUrl()));
-                        // Send the intent to launch a new activity
-                        startActivity(openBrowser);
-                    } catch (Exception e) {
-                        Log.e(LOG_TAG, "An error occurred, please read the stack trace", e);
 
-                        Toast.makeText(parent.getContext(), "Error opening url", Toast.LENGTH_SHORT)
-                                .show();
-                    }
+                // If the current item is somehow null, finish early
+                if (current == null) return;
+
+                // Try to parse the the earthquake url and send an intent
+                // Catch the exception so the app doesn't crash
+                // print the error message to the logs and Show the user that an error occurred
+                try {
+                    // Create a new intent to view the earthquake URI
+                    Intent openBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse(current.getUrl()));
+                    // Send the intent to launch a new activity
+                    startActivity(openBrowser);
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "An error occurred, please read the stack trace", e);
+
+                    Toast.makeText(parent.getContext(), "Error opening url", Toast.LENGTH_SHORT)
+                            .show();
                 }
             }
         });
     }
+
+
 }
