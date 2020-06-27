@@ -35,8 +35,8 @@ import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity {
     private static final String USGS_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
-    public static final String LOG_TAG = EarthquakeActivity.class.getName();
-    public final Context context = this;
+    private static final String LOG_TAG = EarthquakeActivity.class.getName();
+    private final Context context = this;
     private EarthquakeAdapter mAdapter;
 
     @Override
@@ -82,6 +82,7 @@ public class EarthquakeActivity extends AppCompatActivity {
             }
         });
 
+        // Get the earthquake data if possible in a background thread
         EarthquakeAsyncTask networkTask = new EarthquakeAsyncTask();
         networkTask.execute(USGS_URL);
     }
