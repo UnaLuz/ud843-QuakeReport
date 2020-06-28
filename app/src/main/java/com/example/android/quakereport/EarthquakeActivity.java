@@ -15,31 +15,35 @@
  */
 package com.example.android.quakereport;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EarthquakeActivity extends AppCompatActivity {
-    private static final String USGS_URL = "https://earthquake.usgs.gov/fdsnws/event/1/" +
+public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Earthquake>> {
+    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/" +
             "query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
     private static final String LOG_TAG = EarthquakeActivity.class.getName();
-    private final Context context = this;
     private static EarthquakeAdapter mAdapter;
+    /**
+     * Constant value for the earthquake loader ID. We can choose any integer.
+     * This really only comes into play if you're using multiple loaders.
+     */
+    private static final int EARTHQUAKE_LOADER_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,44 +88,46 @@ public class EarthquakeActivity extends AppCompatActivity {
             }
         });
 
-        // Get the earthquake data if possible in a background thread
-        EarthquakeAsyncTask networkTask = new EarthquakeAsyncTask();
-        networkTask.execute(USGS_URL);
+        // Get a reference to the LoaderManager, in order to interact with loaders.
+        LoaderManager loaderManager = LoaderManager.getInstance(this);
+
+        // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+        // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+        // because this activity implements the LoaderCallbacks interface).
+        loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
     }
 
-    @SuppressLint("StaticFieldLeak")
-    private class EarthquakeAsyncTask extends AsyncTask<String, Void, List<Earthquake>> {
+    @NonNull
+    @Override
+    public Loader<List<Earthquake>> onCreateLoader(int id, Bundle args) {
+        // Create a new loader for the given URL
+        return new EarthquakeLoader(this, USGS_REQUEST_URL);
+    }
 
-        @Override
-        protected List<Earthquake> doInBackground(String... urls) {
-            // Return early if there is nothing to do
-            if (urls == null) return null;
+    @Override
+    public void onLoadFinished(@NonNull Loader<List<Earthquake>> loader, List<Earthquake> data) {
+        // Clear the adapter of previous earthquake data
+        mAdapter.clear();
 
-            // Else, look for the first string that is not null or empty
-            String url = null;
-            int i = 0;
-            while (i < urls.length && TextUtils.isEmpty(urls[i])) i++;
-            // If there is no usable string it'll remain null
-            if (i < urls.length) url = urls[i];
-
-            return QueryUtils.fetchEarthquakeData(url);
-        }
-
-        @Override
-        protected void onPostExecute(List<Earthquake> earthquakes) {
-            // Clear the adapter of previous earthquake data
-            mAdapter.clear();
-
-            // If there is a list with actual data, add that to the adapter
-            if (earthquakes != null && !earthquakes.isEmpty()) mAdapter.addAll(earthquakes);
-            else Toast.makeText(context, "Error loading earthquakes\n" +
+        // If there is a list with actual data, add that to the adapter
+        if (data != null && !data.isEmpty()) mAdapter.addAll(data);
+            // Else log it and show a message to the user informing that an error occurred
+        else {
+            Log.e(LOG_TAG, "Error getting the data");
+            Toast.makeText(this, "Error loading earthquakes\n" +
                     "Please try restarting the app", Toast.LENGTH_LONG)
                     .show();
         }
     }
 
+    @Override
+    public void onLoaderReset(@NonNull Loader<List<Earthquake>> loader) {
+        // Loader reset, so we can clear out our existing data.
+        mAdapter.clear();
+    }
+
     /**
-     * Loader class that will replace the AsyncTask class
+     * AsyncTaskLoader class that replaces the AsyncTask class
      */
     public static class EarthquakeLoader extends AsyncTaskLoader<List<Earthquake>> {
         /**
@@ -157,21 +163,6 @@ public class EarthquakeActivity extends AppCompatActivity {
 
             // Perform the network request, parse the response, and extract a list of earthquakes.
             return QueryUtils.fetchEarthquakeData(mUrl);
-        }
-
-        @Override
-        public void deliverResult(List<Earthquake> data) {
-            // Clear the adapter of previous earthquake data
-            mAdapter.clear();
-
-            // If there is a list with actual data, add that to the adapter
-            if (data != null && !data.isEmpty()) mAdapter.addAll(data);
-            else { // Else log it and show a message to the user informing that an error occurred
-                Log.e(LOG_TAG, "Error getting the data");
-                Toast.makeText(getContext(), "Error loading earthquakes\n" +
-                        "Please try restarting the app", Toast.LENGTH_LONG)
-                        .show();
-            }
         }
     }
 }
