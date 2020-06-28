@@ -21,5 +21,6 @@
     <string name="city_placeholder">General San Martin, Argentina</string>
     <string name="mag_placeholder">6.3</string>
     <string name="near_the">Near the</string>
-    <string name="no_earthquakes_found">No earthquakes found</string>
+    <string name="no_earthquakes">No earthquakes to show</string>
+    <string name="no_internet_connection">No internet connection</string>
 </resources>

@@ -17,6 +17,8 @@ package com.example.android.quakereport;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,11 +40,11 @@ import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Earthquake>> {
     private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/" +
-            "query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
+            "query?format=geojson&eventtype=earthquake&orderby=time&minmag=3&limit=30";
     private static final String LOG_TAG = EarthquakeActivity.class.getName();
     private static EarthquakeAdapter mAdapter;
-    public ProgressBar mProgressBar;
-    private TextView mNoEarthquakes;
+    private ProgressBar mProgressBar;
+    private TextView mEmptyStateTextView;
     /**
      * Constant value for the earthquake loader ID. We can choose any integer.
      * This really only comes into play if you're using multiple loaders.
@@ -54,16 +56,16 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
+        // Get the progress bar view by it's id
         mProgressBar = findViewById(R.id.loading_spinner);
-        mProgressBar.setVisibility(View.VISIBLE);
 
         // Find a reference to the {@link ListView} in the layout
         ListView earthquakeListView = findViewById(R.id.list);
 
         // Find a reference to the {@link TextView} in the layout
-        mNoEarthquakes = findViewById(R.id.no_earthquakes_text_view);
+        mEmptyStateTextView = findViewById(R.id.no_earthquakes_text_view);
         // Make the TextView appear only when there are no items to show in the list
-        earthquakeListView.setEmptyView(mNoEarthquakes);
+        earthquakeListView.setEmptyView(mEmptyStateTextView);
 
         // Create a new {@link ArrayAdapter} of earthquakes but initialize it with empty data
         mAdapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
@@ -100,13 +102,29 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
             }
         });
 
-        // Get a reference to the LoaderManager, in order to interact with loaders.
-        LoaderManager loaderManager = LoaderManager.getInstance(this);
+        // Get a connectivity manager
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        // Get network info
+        NetworkInfo activeNetwork;
+        if (connectivityManager != null) activeNetwork = connectivityManager.getActiveNetworkInfo();
+        else activeNetwork = null;
+        // Check if the user has internet connection
+        boolean hasConnection = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
-        // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-        // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-        // because this activity implements the LoaderCallbacks interface).
-        loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+        if (hasConnection) {
+            // Get a reference to the LoaderManager, in order to interact with loaders.
+            LoaderManager loaderManager = LoaderManager.getInstance(this);
+
+            /* Initialize the loader. Pass in the int ID constant defined above and pass in null for
+             the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+             because this activity implements the LoaderCallbacks interface). */
+            loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+        } else {
+            mEmptyStateTextView.setText(R.string.no_internet_connection);
+            mEmptyStateTextView.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -118,6 +136,8 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
     @NonNull
     @Override
     public Loader<List<Earthquake>> onCreateLoader(int id, Bundle args) {
+        // Show the progress bar when the loader is created
+        mProgressBar.setVisibility(View.VISIBLE);
         // Create a new loader for the given URL
         return new EarthquakeLoader(this, USGS_REQUEST_URL);
     }
@@ -130,6 +150,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
      */
     @Override
     public void onLoadFinished(@NonNull Loader<List<Earthquake>> loader, List<Earthquake> data) {
+        // Hide the progress bar when it finished loading
         mProgressBar.setVisibility(View.GONE);
 
         // Clear the adapter of previous earthquake data
@@ -137,7 +158,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
         /* Set the text for the TextView now so it doesn't appear while the loader is trying
         to fetch the data */
-        mNoEarthquakes.setText(R.string.no_earthquakes_found);
+        mEmptyStateTextView.setText(R.string.no_earthquakes);
 
         // If there is a list with actual data, add that to the adapter
         if (data != null && !data.isEmpty()) mAdapter.addAll(data);
