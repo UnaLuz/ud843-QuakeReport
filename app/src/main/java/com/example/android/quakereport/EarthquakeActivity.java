@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,7 +41,8 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
             "query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
     private static final String LOG_TAG = EarthquakeActivity.class.getName();
     private static EarthquakeAdapter mAdapter;
-    private ListView mEarthquakeListView;
+    public ProgressBar mProgressBar;
+    private TextView mNoEarthquakes;
     /**
      * Constant value for the earthquake loader ID. We can choose any integer.
      * This really only comes into play if you're using multiple loaders.
@@ -52,19 +54,27 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
+        mProgressBar = findViewById(R.id.loading_spinner);
+        mProgressBar.setVisibility(View.VISIBLE);
+
         // Find a reference to the {@link ListView} in the layout
-        mEarthquakeListView = findViewById(R.id.list);
+        ListView earthquakeListView = findViewById(R.id.list);
+
+        // Find a reference to the {@link TextView} in the layout
+        mNoEarthquakes = findViewById(R.id.no_earthquakes_text_view);
+        // Make the TextView appear only when there are no items to show in the list
+        earthquakeListView.setEmptyView(mNoEarthquakes);
 
         // Create a new {@link ArrayAdapter} of earthquakes but initialize it with empty data
         mAdapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
-        mEarthquakeListView.setAdapter(mAdapter);
+        earthquakeListView.setAdapter(mAdapter);
 
         // Add a click event to each list item
         // This will send an intent for the user to open the earthquake info page
-        mEarthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Find the current earthquake that was clicked on
@@ -120,13 +130,14 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
      */
     @Override
     public void onLoadFinished(@NonNull Loader<List<Earthquake>> loader, List<Earthquake> data) {
+        mProgressBar.setVisibility(View.GONE);
+
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
 
-        // Make the TextView with ID no_earthquakes_text_view appear only when there are no items
-        // to show in the list but only after it finished trying to load the earthquakes
-        TextView noEarthquakes = findViewById(R.id.no_earthquakes_text_view);
-        mEarthquakeListView.setEmptyView(noEarthquakes);
+        /* Set the text for the TextView now so it doesn't appear while the loader is trying
+        to fetch the data */
+        mNoEarthquakes.setText(R.string.no_earthquakes_found);
 
         // If there is a list with actual data, add that to the adapter
         if (data != null && !data.isEmpty()) mAdapter.addAll(data);
