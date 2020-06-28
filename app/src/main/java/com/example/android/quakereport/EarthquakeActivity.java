@@ -29,15 +29,17 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.content.AsyncTaskLoader;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity {
-    private static final String USGS_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
+    private static final String USGS_URL = "https://earthquake.usgs.gov/fdsnws/event/1/" +
+            "query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
     private static final String LOG_TAG = EarthquakeActivity.class.getName();
     private final Context context = this;
-    private EarthquakeAdapter mAdapter;
+    private static EarthquakeAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +76,7 @@ public class EarthquakeActivity extends AppCompatActivity {
                     // Send the intent to launch a new activity
                     startActivity(openBrowser);
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, "An error occurred, please read the stack trace", e);
+                    Log.e(LOG_TAG, "Error parsing the url or opening it in a browser", e);
 
                     Toast.makeText(parent.getContext(), "Error opening url", Toast.LENGTH_SHORT)
                             .show();
@@ -115,6 +117,61 @@ public class EarthquakeActivity extends AppCompatActivity {
             else Toast.makeText(context, "Error loading earthquakes\n" +
                     "Please try restarting the app", Toast.LENGTH_LONG)
                     .show();
+        }
+    }
+
+    /**
+     * Loader class that will replace the AsyncTask class
+     */
+    public static class EarthquakeLoader extends AsyncTaskLoader<List<Earthquake>> {
+        /**
+         * Tag for log messages
+         */
+        private static final String LOG_TAG = EarthquakeLoader.class.getName();
+
+        /**
+         * Query URL
+         */
+        private String mUrl;
+
+        /**
+         * Constructs a new {@link EarthquakeLoader}.
+         *
+         * @param context of the activity
+         * @param url     to load data from
+         */
+        public EarthquakeLoader(Context context, String url) {
+            super(context);
+            mUrl = url;
+        }
+
+        @Override
+        protected void onStartLoading() {
+            forceLoad();
+        }
+
+        @Override
+        public List<Earthquake> loadInBackground() {
+            // Return early if there is nothing to do
+            if (mUrl == null) return null;
+
+            // Perform the network request, parse the response, and extract a list of earthquakes.
+            return QueryUtils.fetchEarthquakeData(mUrl);
+        }
+
+        @Override
+        public void deliverResult(List<Earthquake> data) {
+            // Clear the adapter of previous earthquake data
+            mAdapter.clear();
+
+            // If there is a list with actual data, add that to the adapter
+            if (data != null && !data.isEmpty()) mAdapter.addAll(data);
+            else { // Else log it and show a message to the user informing that an error occurred
+                Log.e(LOG_TAG, "Error getting the data");
+                Toast.makeText(getContext(), "Error loading earthquakes\n" +
+                        "Please try restarting the app", Toast.LENGTH_LONG)
+                        .show();
+            }
         }
     }
 }
