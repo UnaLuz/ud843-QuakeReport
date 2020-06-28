@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -39,6 +40,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
             "query?format=geojson&eventtype=earthquake&orderby=time&minmag=5&limit=10";
     private static final String LOG_TAG = EarthquakeActivity.class.getName();
     private static EarthquakeAdapter mAdapter;
+    private ListView mEarthquakeListView;
     /**
      * Constant value for the earthquake loader ID. We can choose any integer.
      * This really only comes into play if you're using multiple loaders.
@@ -51,18 +53,18 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         setContentView(R.layout.earthquake_activity);
 
         // Find a reference to the {@link ListView} in the layout
-        ListView earthquakeListView = findViewById(R.id.list);
+        mEarthquakeListView = findViewById(R.id.list);
 
         // Create a new {@link ArrayAdapter} of earthquakes but initialize it with empty data
         mAdapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
-        earthquakeListView.setAdapter(mAdapter);
+        mEarthquakeListView.setAdapter(mAdapter);
 
         // Add a click event to each list item
         // This will send an intent for the user to open the earthquake info page
-        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mEarthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Find the current earthquake that was clicked on
@@ -97,6 +99,12 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
     }
 
+    /**
+     * Creates a Loader that'll try to load the info from the USGS url
+     *
+     * @param id   unique ID for the loader
+     * @param args is the previous loader configuration if there was any
+     */
     @NonNull
     @Override
     public Loader<List<Earthquake>> onCreateLoader(int id, Bundle args) {
@@ -104,10 +112,21 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         return new EarthquakeLoader(this, USGS_REQUEST_URL);
     }
 
+    /**
+     * This get's called once the load finished (successfully or not)
+     *
+     * @param loader is the loader that does the background thread work
+     * @param data   is the data gathered by the loader
+     */
     @Override
     public void onLoadFinished(@NonNull Loader<List<Earthquake>> loader, List<Earthquake> data) {
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
+
+        // Make the TextView with ID no_earthquakes_text_view appear only when there are no items
+        // to show in the list but only after it finished trying to load the earthquakes
+        TextView noEarthquakes = findViewById(R.id.no_earthquakes_text_view);
+        mEarthquakeListView.setEmptyView(noEarthquakes);
 
         // If there is a list with actual data, add that to the adapter
         if (data != null && !data.isEmpty()) mAdapter.addAll(data);
@@ -120,6 +139,11 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         }
     }
 
+    /**
+     * This get's called in case the loader needs to be reset
+     *
+     * @param loader is the loader that does the background thread work
+     */
     @Override
     public void onLoaderReset(@NonNull Loader<List<Earthquake>> loader) {
         // Loader reset, so we can clear out our existing data.
@@ -151,11 +175,13 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
             mUrl = url;
         }
 
+        /** This get's called before loadInBackground and it'll force it to start */
         @Override
         protected void onStartLoading() {
             forceLoad();
         }
 
+        /** Background thread work, it'll fetch the earthquake data if possible */
         @Override
         public List<Earthquake> loadInBackground() {
             // Return early if there is nothing to do
